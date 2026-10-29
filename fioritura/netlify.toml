@@ -1,0 +1,44 @@
+[build]
+  command = "rm -rf dist && mkdir -p dist && cp index.html dist/ && cp -R assets dist/"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# La stessa rotta usata dal server Python locale: così index.html
+# funziona identico su file://, in locale e su Netlify.
+[[redirects]]
+  from = "/api/leaderboard"
+  to = "/.netlify/functions/leaderboard"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/shop"
+  to = "/.netlify/functions/shop"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/calls"
+  to = "/.netlify/functions/calls"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin"
+  to = "/.netlify/functions/admin"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

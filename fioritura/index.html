@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fioritura — Albero della Vita</title>
+  <meta name="description" content="Un tempo calmo per respirare, con paesaggi sonori generati dal vivo. Ogni sessione e ogni seme fanno crescere il tuo Albero della Vita; guadagna XP e scala la classifica dei respiri.">
+  <meta name="theme-color" content="#0a0d1a">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@300..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop__photo" id="backdropPhoto"></div>
+    <div class="backdrop__veil"></div>
+    <div class="aurora aurora--one"></div>
+    <div class="aurora aurora--two"></div>
+    <div class="aurora aurora--three"></div>
+    <canvas id="drift"></canvas>
+    <div class="grain"></div>
+  </div>
+
+  <a class="skip-link" href="#timer">Vai al timer</a>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" id="brandLogo" href="#top" aria-label="Fioritura, torna all'inizio">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M16 16c-5.2-1.2-8.4-4.4-8.4-8.4 4 0 7.2 3.2 8.4 8.4Z"/>
+            <path d="M16 16c1.2-5.2 4.4-8.4 8.4-8.4 0 4-3.2 7.2-8.4 8.4Z"/>
+            <path d="M16 16c5.2 1.2 8.4 4.4 8.4 8.4-4 0-7.2-3.2-8.4-8.4Z"/>
+            <path d="M16 16c-1.2 5.2-4.4 8.4-8.4 8.4 0-4 3.2-7.2 8.4-8.4Z"/>
+            <circle cx="16" cy="16" r="2.2" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+        <span>Fioritura</span>
+      </a>
+
+      <p class="topbar__quote" id="topbarQuote" aria-live="polite"></p>
+
+      <div class="topbar__actions">
+        <button class="icon-btn" id="callButton" type="button" title="Videochiamata" aria-label="Apri le videochiamate">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.4" width="12.4" height="11.2" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15.4 10.4 4.3-2.5a1 1 0 0 1 1.5.9v6.4a1 1 0 0 1-1.5.9l-4.3-2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8.2" cy="12" r="2.3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          <span class="call-badge" id="callBadge" hidden aria-hidden="true"></span>
+        </button>
+        <button class="icon-btn" id="soundQuick" type="button" title="Accendi o spegni i suoni" aria-label="Accendi o spegni i suoni" aria-pressed="false">
+          <svg class="icon icon--on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.3 3.4V6.1L7.2 9.5H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 8.6a4.8 4.8 0 0 1 0 6.8M17.7 6a8.4 8.4 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg class="icon icon--off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.3 3.4V6.1L7.2 9.5H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m16 9.5 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" id="shopButton" type="button" title="Negozio" aria-label="Apri il negozio">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.8 8h12.4l-1.1 11.1a1.9 1.9 0 0 1-1.9 1.7H8.8a1.9 1.9 0 0 1-1.9-1.7L5.8 8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" id="settingsButton" type="button" title="Impostazioni" aria-label="Apri le impostazioni">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19.4 13.6a7.7 7.7 0 0 0 0-3.2l2-1.3-1.8-3.1-2.2.9a7.7 7.7 0 0 0-2.7-1.5L14.4 3h-3.6l-.3 2.4a7.7 7.7 0 0 0-2.7 1.5l-2.2-.9-1.8 3.1 2 1.3a7.7 7.7 0 0 0 0 3.2l-2 1.3 1.8 3.1 2.2-.9c.8.7 1.7 1.2 2.7 1.5l.3 2.4h3.6l.3-2.4c1-.3 1.9-.8 2.7-1.5l2.2.9 1.8-3.1-2-1.3Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="btn btn--ghost btn--sm profile-btn" id="profileButton" type="button">
+          <span class="avatar avatar--xs" id="topAvatar" hidden></span>
+          <span id="profileLabel">Entra in classifica</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="announcement" id="announcement" hidden>
+    <div class="announcement__inner">
+      <span class="announcement__dot" aria-hidden="true"></span>
+      <p id="announcementText"></p>
+      <button class="announcement__close" id="announcementClose" type="button" aria-label="Chiudi l'annuncio">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__dot"></span> Albero della Vita &amp; suoni rilassanti</p>
+        <h1>Trova il tuo ritmo.<br><em>Respira.</em></h1>
+        <p class="lede">Scegli quanto tempo restare presente, lascia che i suoni ti accompagnino. Ogni sessione da 5 minuti in su nutre il tuo Albero della Vita e il tuo posto in classifica. Un seme al giorno lo fa crescere ancora.</p>
+
+        <div class="hero__stats" aria-label="I tuoi progressi">
+          <div class="mini">
+            <span>Livello</span>
+            <strong id="heroLevel">1 · Seme</strong>
+          </div>
+          <div class="mini">
+            <span>XP totali</span>
+            <strong id="heroXp">0</strong>
+          </div>
+          <div class="mini">
+            <span>Serie</span>
+            <strong id="heroStreak">0 giorni</strong>
+          </div>
+        </div>
+
+        <a class="scroll-hint" href="#suoni">
+          Scopri i paesaggi sonori
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v10m0 0 4-4m-4 4L4 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="timer-wrap" id="timer">
+        <div class="glass timer" id="timerCard">
+          <div class="timer__head">
+            <span class="status-pill" id="statusPill">
+              <span class="status-pill__dot"></span>
+              <span id="statusText">Pronto</span>
+            </span>
+            <span class="timer__session" id="sessionLabel">Sessione 1</span>
+          </div>
+
+          <div class="dial">
+            <svg class="dial__svg" viewBox="0 0 340 340" aria-hidden="true">
+              <defs>
+                <linearGradient id="ringGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ffd3ad"/>
+                  <stop offset="48%" stop-color="#ff9fb6"/>
+                  <stop offset="100%" stop-color="#c3aaff"/>
+                </linearGradient>
+                <radialGradient id="haloGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffb9a6" stop-opacity=".16"/>
+                  <stop offset="62%" stop-color="#b9a7ff" stop-opacity=".05"/>
+                  <stop offset="100%" stop-color="#b9a7ff" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="ringGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#ff9fb6" flood-opacity=".55"/>
+                </filter>
+                <filter id="dotGlow" x="-200%" y="-200%" width="500%" height="500%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ffd3ad" flood-opacity=".95"/>
+                </filter>
+              </defs>
+              <circle cx="170" cy="170" r="150" fill="url(#haloGradient)"/>
+              <circle class="dial__orbit" cx="170" cy="170" r="163"/>
+              <circle class="dial__track" cx="170" cy="170" r="150"/>
+              <circle class="dial__progress" id="ringProgress" cx="170" cy="170" r="150" pathLength="100"/>
+              <circle class="dial__dot" id="ringDot" cx="170" cy="20" r="5" filter="url(#dotGlow)"/>
+            </svg>
+
+            <div class="dial__tree" id="dialTree" aria-hidden="true"></div>
+
+            <div class="dial__center">
+              <span class="dial__label" id="dialLabel">tempo rimanente</span>
+              <div class="dial__time" id="timeDisplay" role="timer" aria-live="off">25:00</div>
+              <span class="dial__xp" id="xpPreview">≈ +313 XP</span>
+            </div>
+          </div>
+
+          <div class="timer__controls">
+            <button class="round-btn" id="resetBtn" type="button" aria-label="Azzera il timer" title="Azzera (R)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 9.5A8 8 0 1 1 4 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 5.5v4.3h4.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+
+            <button class="play-btn" id="startBtn" type="button" aria-label="Inizia la sessione">
+              <svg class="play-btn__play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.4v13.2c0 .7.8 1.2 1.4.8l10-6.6a1 1 0 0 0 0-1.6l-10-6.6c-.6-.4-1.4.1-1.4.8Z" fill="currentColor"/></svg>
+              <svg class="play-btn__pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.4" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.4" fill="currentColor"/></svg>
+              <span id="startLabel">Inizia</span>
+            </button>
+
+            <button class="round-btn round-btn--text" id="addFiveBtn" type="button" aria-label="Aggiungi cinque minuti" title="Aggiungi 5 minuti">
+              +5
+            </button>
+          </div>
+
+          <div class="presets" id="presets" role="group" aria-label="Durate rapide">
+            <button type="button" class="preset" data-minutes="5">5<span>min</span></button>
+            <button type="button" class="preset" data-minutes="15">15<span>min</span></button>
+            <button type="button" class="preset is-active" data-minutes="25">25<span>min</span></button>
+            <button type="button" class="preset" data-minutes="45">45<span>min</span></button>
+            <button type="button" class="preset" data-minutes="60">60<span>min</span></button>
+            <button type="button" class="preset" data-minutes="90">90<span>min</span></button>
+          </div>
+
+          <form class="custom-time" id="customForm">
+            <span class="custom-time__label">Personalizza</span>
+            <label class="time-field">
+              <input id="customMinutes" type="number" min="1" max="180" step="1" value="25" inputmode="numeric" aria-label="Minuti">
+              <span>min</span>
+            </label>
+            <label class="time-field">
+              <input id="customSeconds" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" aria-label="Secondi">
+              <span>sec</span>
+            </label>
+            <button class="btn btn--soft btn--sm" type="submit">Imposta</button>
+          </form>
+
+          <div class="prefs">
+            <label class="switch">
+              <input type="checkbox" id="prefMusic" checked>
+              <span class="switch__ui" aria-hidden="true"></span>
+              <span>Musica con il timer</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="prefNotify">
+              <span class="switch__ui" aria-hidden="true"></span>
+              <span>Avvisami alla fine</span>
+            </label>
+          </div>
+
+          <span class="sr-only" id="timerAnnouncer" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="suoni">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Ambiente</p>
+          <h2>Paesaggi sonori</h2>
+        </div>
+        <p class="section__note">Musica generata dal vivo nel tuo browser. Nessun file da scaricare, nessuna attesa.</p>
+      </div>
+
+      <div class="panels">
+        <div class="glass panel sounds">
+          <div class="sounds__list" id="soundList" role="group" aria-label="Scegli un paesaggio sonoro">
+            <button class="sound" type="button" data-track="rain" aria-pressed="false">
+              <span class="sound__icon sound__icon--rain" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6.8 14.8h10.4a3.6 3.6 0 0 0 .4-7.2 5.6 5.6 0 0 0-10.8 1.1 3.1 3.1 0 0 0 0 6.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m8.2 17.3-.9 2m4.4-2-1 2.6m4.7-2.6-1 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="sound__meta">
+                <strong>Pioggia lenta</strong>
+                <small>Piano, gocce e cielo morbido</small>
+              </span>
+              <span class="sound__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </button>
+
+            <button class="sound" type="button" data-track="waves" aria-pressed="false">
+              <span class="sound__icon sound__icon--waves" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 9.2c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2 2.4-2 4.6-2M3 14.6c2.4 0 2.4 2 4.8 2s2.4-2 4.8-2 2.4 2 4.8 2 2.4-2 4.6-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="sound__meta">
+                <strong>Onde del sud</strong>
+                <small>Respiro del mare, campane lontane</small>
+              </span>
+              <span class="sound__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </button>
+
+            <button class="sound" type="button" data-track="forest" aria-pressed="false">
+              <span class="sound__icon sound__icon--forest" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3.2 6.8 11h2.4l-3 4.8h11.6l-3-4.8h2.4L12 3.2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 15.8V21m-2.6 0h5.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="sound__meta">
+                <strong>Bosco di notte</strong>
+                <small>Gril, vento e un gufo discreto</small>
+              </span>
+              <span class="sound__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </button>
+
+            <button class="sound" type="button" data-track="musicbox" aria-pressed="false">
+              <span class="sound__icon sound__icon--musicbox" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 17.8V6.5l8-1.7v11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="6.6" cy="18" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14.6" cy="16.2" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              </span>
+              <span class="sound__meta">
+                <strong>Carillon di vetro</strong>
+                <small>Note leggere, riverbero di stelle</small>
+              </span>
+              <span class="sound__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </button>
+          </div>
+
+          <div class="sources">
+            <div class="sources__head">
+              <span class="sources__title">La tua musica</span>
+              <span class="sources__hint">Collega una playlist</span>
+            </div>
+            <div class="sources__row">
+              <button class="source source--spotify" id="sourceSpotify" type="button" data-source="spotify" aria-label="Collega una playlist Spotify">
+                <span class="source__logo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.2 9.6c3.3-.9 6.8-.6 9.6.8M7.8 12.4c2.7-.7 5.5-.4 7.8.7M8.4 15.1c2.1-.5 4.2-.3 6 .6" fill="none" stroke="#08130d" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <span class="source__text">
+                  <strong>Spotify</strong>
+                  <small id="sourceSpotifyState">Non collegato</small>
+                </span>
+              </button>
+
+              <button class="source source--youtube" id="sourceYoutube" type="button" data-source="youtube" aria-label="Collega una playlist YouTube">
+                <span class="source__logo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="2.2" y="5" width="19.6" height="14" rx="4.2" fill="currentColor"/><path d="M10 8.9v6.2l5.3-3.1L10 8.9Z" fill="#1a0a0c"/></svg>
+                </span>
+                <span class="source__text">
+                  <strong>YouTube</strong>
+                  <small id="sourceYoutubeState">Non collegato</small>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sounds__footer">
+            <button class="btn btn--soft btn--sm" id="stopSound" type="button" disabled>
+              <span class="sound-dot" aria-hidden="true"></span>
+              <span id="soundStatus">Silenzio</span>
+            </button>
+            <label class="volume">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.2l4.3 3.4V6.1L7.2 9.5H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15 8.8a4.6 4.6 0 0 1 0 6.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <input id="volume" type="range" min="0" max="100" step="1" value="55" aria-label="Volume della musica">
+              <span id="volumeValue">55%</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="glass panel garden">
+          <div class="garden__head">
+            <div>
+              <p class="eyebrow">Il tuo Albero della Vita</p>
+              <h3 id="levelTitle">Livello 1 · Seme</h3>
+            </div>
+            <span class="level-badge" id="levelBadge">Lv 1</span>
+          </div>
+
+          <div class="tree-stage" id="treeStage" data-stage="0">
+            <div class="tree-stage__glow" aria-hidden="true"></div>
+            <div class="tree-stage__tree" id="gardenTree" role="img" aria-label="Il tuo Albero della Vita: Seme"></div>
+            <div class="tree-stage__ground" aria-hidden="true"></div>
+            <span class="tree-stage__name" id="treeStageName">Seme</span>
+          </div>
+
+          <div class="tree-plant">
+            <div class="tree-plant__copy">
+              <strong id="plantTitle">Pianta un seme</strong>
+              <span id="plantHint">Un seme al giorno. Anche senza sessioni, l'albero cresce.</span>
+            </div>
+            <button class="btn btn--soft btn--sm" id="plantSeed" type="button">Pianta il seme di oggi</button>
+          </div>
+
+          <div class="level-bar" role="progressbar" aria-valuemin="0" aria-valuemax="500" aria-valuenow="0" id="levelProgress">
+            <span id="levelBar"></span>
+          </div>
+          <p class="level-hint" id="levelHint">Ti mancano 500 XP per il prossimo livello.</p>
+
+          <div class="garden__stats">
+            <div class="stat">
+              <span>XP totali</span>
+              <strong id="statXp">0</strong>
+            </div>
+            <div class="stat">
+              <span>Minuti di presenza</span>
+              <strong id="statMinutes">0</strong>
+            </div>
+            <div class="stat">
+              <span>Sessioni</span>
+              <strong id="statSessions">0</strong>
+            </div>
+            <div class="stat">
+              <span>Semi piantati</span>
+              <strong id="statSeeds">0</strong>
+            </div>
+          </div>
+
+          <div class="recent">
+            <h4>Ultime sessioni</h4>
+            <ul id="recentList" class="recent__list">
+              <li class="recent__empty">Il tuo albero è pronto. La prima sessione lo farà germogliare.</li>
+            </ul>
+          </div>
+
+          <details class="xp-rules">
+            <summary>Come si guadagnano gli XP?</summary>
+            <div>
+              <p>Ogni minuto completato vale <strong>10 XP</strong>, ma solo per sessioni da <strong>5 minuti in su</strong>.</p>
+              <ul>
+                <li>da 25 minuti: <strong>+25%</strong></li>
+                <li>da 50 minuti: <strong>+50%</strong></li>
+                <li>bonus serie: <strong>+10%</strong> per ogni giorno consecutivo, fino a <strong>+50%</strong></li>
+              </ul>
+              <p class="xp-rules__note">La serie conta i giorni in cui completi almeno una sessione.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="classifica">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">La community</p>
+          <h2>Classifica dei respiri</h2>
+        </div>
+        <div class="segmented" role="tablist" aria-label="Periodo della classifica">
+          <button type="button" role="tab" id="tabWeek" aria-selected="true" data-period="week">Settimana</button>
+          <button type="button" role="tab" id="tabAll" aria-selected="false" data-period="all">Sempre</button>
+        </div>
+      </div>
+
+      <div class="glass panel leaderboard">
+        <div class="lb-top">
+          <div>
+            <p class="lb-mode" id="lbMode"><span class="lb-mode__dot"></span> <span id="lbModeText">Classifica salvata su questo dispositivo</span></p>
+            <p class="lb-sub" id="lbSub">Completa una sessione per entrare in classifica.</p>
+          </div>
+          <button class="btn btn--soft btn--sm" id="saveScoreButton" type="button">Crea il tuo profilo</button>
+        </div>
+
+        <div class="podium" id="podium" aria-hidden="true"></div>
+        <ol class="lb-list" id="lbList" aria-label="Classifica"></ol>
+        <p class="lb-foot" id="lbFoot">XP guadagnati nelle sessioni completate.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <p><span class="brand__mini">Fioritura</span> · un piccolo posto per respirare.</p>
+      <p class="footer__note">I suoni sono generati nel browser con la Web Audio API. Nessuna traccia audio, nessun tracciamento.</p>
+    </div>
+  </footer>
+
+  <div class="modal" id="settingsModal" hidden>
+    <div class="modal__backdrop" data-close="settings"></div>
+    <div class="modal__card modal__card--settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="settings__head">
+        <div>
+          <p class="eyebrow">Fatte su misura</p>
+          <h2 id="settingsTitle">Impostazioni</h2>
+        </div>
+        <button class="modal__close" type="button" data-close="settings" aria-label="Chiudi le impostazioni">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="settings__body">
+        <nav class="settings__tabs" role="tablist" aria-label="Sezioni delle impostazioni" aria-orientation="vertical">
+          <button class="settings__tab" type="button" role="tab" id="tabProfile" aria-controls="panelProfile" aria-selected="true" data-panel="profilo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.4" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 19.4c.7-3.3 3.5-5.1 7-5.1s6.3 1.8 7 5.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Profilo</span>
+          </button>
+          <button class="settings__tab" type="button" role="tab" id="tabAppearance" aria-controls="panelAppearance" aria-selected="false" data-panel="aspetto" tabindex="-1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2.1-.8 2.1-1.8 0-.9-.7-1.5-.7-2.4 0-1 .8-1.8 1.9-1.8h1.3a3.9 3.9 0 0 0 3.9-3.9c0-3.9-3.8-7.1-8.5-7.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8.1" cy="10.4" r="1.1" fill="currentColor"/><circle cx="11.6" cy="7.4" r="1.1" fill="currentColor"/><circle cx="15.6" cy="9.1" r="1.1" fill="currentColor"/></svg>
+            <span>Aspetto</span>
+          </button>
+          <button class="settings__tab" type="button" role="tab" id="tabTimer" aria-controls="panelTimer" aria-selected="false" data-panel="timer" tabindex="-1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12.6" r="7.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 8.8v4l2.6 1.7M9.4 3.2h5.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Timer e suoni</span>
+          </button>
+          <button class="settings__tab" type="button" role="tab" id="tabData" aria-controls="panelData" aria-selected="false" data-panel="dati" tabindex="-1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6.2" rx="7" ry="2.7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 6.2v11.6c0 1.5 3.1 2.7 7 2.7s7-1.2 7-2.7V6.2M5 12c0 1.5 3.1 2.7 7 2.7s7-1.2 7-2.7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>Dati</span>
+          </button>
+        </nav>
+
+        <div class="settings__panels">
+          <section class="settings__panel" id="panelProfile" role="tabpanel" aria-labelledby="tabProfile" data-panel="profilo">
+            <div class="profile-card">
+              <span class="avatar avatar--xl" id="avatarPreview">·</span>
+              <div class="profile-card__meta">
+                <strong id="settingsProfileName">Il tuo profilo</strong>
+                <span class="lb-badge" id="settingsProfileBadge" hidden></span>
+                <span id="settingsProfileMeta">Scegli un nome e un paese per entrare in classifica.</span>
+                <div class="profile-card__actions">
+                  <button class="btn btn--soft btn--sm" id="avatarPick" type="button">Carica foto</button>
+                  <button class="btn btn--ghost btn--sm" id="avatarRemove" type="button" disabled>Rimuovi</button>
+                  <input id="avatarInput" type="file" accept="image/*" hidden>
+                </div>
+              </div>
+            </div>
+
+            <form id="profileForm" novalidate>
+              <label class="field">
+                <span>Nome utente</span>
+                <input id="nameInput" type="text" maxlength="20" minlength="2" required autocomplete="nickname" placeholder="es. Luna" aria-describedby="profileHint">
+              </label>
+
+              <div class="field">
+                <span id="countryLabel">Paese</span>
+                <div class="combo" id="countryCombo">
+                  <button class="combo__button" type="button" id="countryButton" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="countryLabel countryName">
+                    <span class="combo__flag" id="countryFlag">🇮🇹</span>
+                    <span class="combo__name" id="countryName">Italia</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div class="combo__pop" id="countryPop" hidden>
+                    <input class="combo__search" id="countrySearch" type="search" placeholder="Cerca un paese…" autocomplete="off" aria-label="Cerca un paese">
+                    <ul class="combo__list" id="countryList" role="listbox" aria-label="Paesi"></ul>
+                  </div>
+                  <input type="hidden" id="countryCode" value="IT">
+                </div>
+              </div>
+
+              <p class="form-hint" id="profileHint">Il nome è visibile nella classifica. Puoi cambiarlo quando vuoi.</p>
+              <button class="btn btn--primary btn--full" type="submit" id="profileSubmit">Salva il profilo</button>
+              <p class="form-note" id="profilePending" hidden></p>
+            </form>
+
+            <p class="settings__note">La foto profilo resta su questo dispositivo e non viene inviata alla classifica condivisa.</p>
+          </section>
+
+          <section class="settings__panel" id="panelAppearance" role="tabpanel" aria-labelledby="tabAppearance" data-panel="aspetto" hidden>
+            <div class="settings__group">
+              <div class="settings__group-head">
+                <h3>Sfondo</h3>
+                <p>Sette atmosfere pensate per abbassare le spalle. Puoi anche usare una tua foto.</p>
+              </div>
+
+              <div class="theme-grid" id="themeGrid" role="radiogroup" aria-label="Scegli lo sfondo">
+                <button class="swatch" type="button" data-theme="aurora" role="radio" aria-checked="true">
+                  <span class="swatch__preview swatch__preview--aurora"></span>
+                  <span class="swatch__name">Aurora</span>
+                </button>
+                <button class="swatch" type="button" data-theme="alba" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--alba"></span>
+                  <span class="swatch__name">Alba</span>
+                </button>
+                <button class="swatch" type="button" data-theme="oceano" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--oceano"></span>
+                  <span class="swatch__name">Oceano</span>
+                </button>
+                <button class="swatch" type="button" data-theme="foresta" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--foresta"></span>
+                  <span class="swatch__name">Foresta</span>
+                </button>
+                <button class="swatch" type="button" data-theme="notte" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--notte"></span>
+                  <span class="swatch__name">Notte</span>
+                </button>
+                <button class="swatch" type="button" data-theme="deserto" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--deserto"></span>
+                  <span class="swatch__name">Deserto</span>
+                </button>
+                <button class="swatch" type="button" data-theme="lavanda" role="radio" aria-checked="false">
+                  <span class="swatch__preview swatch__preview--lavanda"></span>
+                  <span class="swatch__name">Lavanda</span>
+                </button>
+              </div>
+
+              <div class="settings__row settings__row--split">
+                <div class="settings__copy">
+                  <strong>Una tua foto</strong>
+                  <span>Un ricordo, un panorama, il muro di casa. Resta salvata qui.</span>
+                </div>
+                <div class="settings__inline">
+                  <button class="btn btn--soft btn--sm" id="customBgPick" type="button">Scegli immagine</button>
+                  <button class="btn btn--ghost btn--sm" id="customBgRemove" type="button" disabled>Rimuovi</button>
+                  <input id="customBgInput" type="file" accept="image/*" hidden>
+                </div>
+              </div>
+              <p class="settings__note" id="customBgHint" hidden></p>
+
+              <label class="settings__slider">
+                <span><span>Intensità dell'atmosfera</span><strong id="atmosphereValue">100%</strong></span>
+                <input id="atmosphere" type="range" min="10" max="100" step="5" value="100" aria-label="Intensità dell'atmosfera">
+              </label>
+            </div>
+
+            <div class="settings__group">
+              <div class="settings__group-head">
+                <h3>Interfaccia</h3>
+                <p>Piccoli aggiustamenti per stare comodo.</p>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Particelle</strong>
+                  <span>La polvere di luce che sale lentamente sullo sfondo.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="particleToggle" checked>
+                  <span class="switch__ui" aria-hidden="true"></span>
+                  <span class="sr-only">Mostra le particelle</span>
+                </label>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Movimento ridotto</strong>
+                  <span>Ferma le animazioni e le dissolvenze dello sfondo.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="motionToggle">
+                  <span class="switch__ui" aria-hidden="true"></span>
+                  <span class="sr-only">Riduci le animazioni</span>
+                </label>
+              </div>
+
+              <div class="settings__row settings__row--stack">
+                <div class="settings__copy">
+                  <strong>Dimensione del testo</strong>
+                  <span>Cambia la scala di tutta l'interfaccia.</span>
+                </div>
+                <div class="segmented" id="scaleChoice" role="group" aria-label="Dimensione del testo">
+                  <button type="button" data-scale="compact" aria-pressed="false">Piccolo</button>
+                  <button type="button" data-scale="normal" aria-pressed="true">Normale</button>
+                  <button type="button" data-scale="large" aria-pressed="false">Grande</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings__panel" id="panelTimer" role="tabpanel" aria-labelledby="tabTimer" data-panel="timer" hidden>
+            <div class="settings__group">
+              <div class="settings__group-head">
+                <h3>Timer</h3>
+                <p>La durata con cui Fioritura si apre ogni volta.</p>
+              </div>
+
+              <form class="settings__row settings__row--split" id="settingsDurationForm">
+                <div class="settings__copy">
+                  <strong>Durata predefinita</strong>
+                  <span>Da 1 a 180 minuti. Applicarla ora azzera il timer in corso.</span>
+                </div>
+                <div class="settings__inline">
+                  <label class="time-field">
+                    <input id="settingsDuration" type="number" min="1" max="180" step="1" value="25" inputmode="numeric" aria-label="Durata predefinita in minuti">
+                    <span>min</span>
+                  </label>
+                  <button class="btn btn--soft btn--sm" type="submit">Applica ora</button>
+                </div>
+              </form>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Avviso di fine sessione</strong>
+                  <span>Una notifica del sistema quando il tempo è finito, anche a scheda chiusa.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="settingsNotify">
+                  <span class="switch__ui" aria-hidden="true"></span>
+                  <span class="sr-only">Attiva le notifiche di fine sessione</span>
+                </label>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Campanella di chiusura</strong>
+                  <span>Un piccolo motivo quando una sessione arriva in fondo.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="settingsChime" checked>
+                  <span class="switch__ui" aria-hidden="true"></span>
+                  <span class="sr-only">Suona la campanella a fine sessione</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings__group">
+              <div class="settings__group-head">
+                <h3>Suoni</h3>
+                <p>Musica generata dal vivo, senza file da scaricare.</p>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Musica con il timer</strong>
+                  <span>Avvia il paesaggio sonoro scelto insieme alla sessione.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="settingsMusic" checked>
+                  <span class="switch__ui" aria-hidden="true"></span>
+                  <span class="sr-only">Avvia la musica con il timer</span>
+                </label>
+              </div>
+
+              <label class="settings__slider">
+                <span><span>Volume della musica</span><strong id="settingsVolumeValue">55%</strong></span>
+                <input id="settingsVolume" type="range" min="0" max="100" step="1" value="55" aria-label="Volume della musica">
+              </label>
+
+              <p class="settings__note">I quattro paesaggi sonori si scelgono nella sezione «Paesaggi sonori» della pagina.</p>
+            </div>
+          </section>
+
+          <section class="settings__panel" id="panelData" role="tabpanel" aria-labelledby="tabData" data-panel="dati" hidden>
+            <div class="settings__group">
+              <div class="settings__group-head">
+                <h3>I tuoi dati</h3>
+                <p>Tutto vive nel tuo browser. Puoi portartelo via o ricominciare.</p>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Esporta tutto</strong>
+                  <span>Profilo, progressi, impostazioni e classifica locale in un file JSON.</span>
+                </div>
+                <button class="btn btn--soft btn--sm" id="exportData" type="button">Scarica backup</button>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Azzera i progressi</strong>
+                  <span>XP, serie, sessioni e timer ripartono da zero; perdi anche gli oggetti comprati e gli XP del salvadanaio. La classifica condivisa conserva i punteggi già inviati.</span>
+                </div>
+                <button class="btn btn--danger btn--sm" id="resetProgress" type="button">Riparti da zero</button>
+              </div>
+
+              <div class="settings__row">
+                <div class="settings__copy">
+                  <strong>Ripristina Fioritura</strong>
+                  <span>Elimina profilo, progressi, foto e preferenze da questo dispositivo.</span>
+                </div>
+                <button class="btn btn--danger btn--sm" id="resetAll" type="button">Elimina tutto</button>
+              </div>
+            </div>
+
+            <p class="settings__note">Nessun account, nessun tracciamento. Se usi la classifica condivisa, il tuo nome, paese e punteggio vengono inviati al server Fioritura che stai utilizzando.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="musicModal" hidden>
+    <div class="modal__backdrop" data-close="music"></div>
+    <div class="modal__card modal__card--music" role="dialog" aria-modal="true" aria-labelledby="musicTitle">
+      <button class="modal__close" type="button" data-close="music" aria-label="Chiudi">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <p class="eyebrow">La tua colonna sonora</p>
+      <h2 id="musicTitle">Collega la tua musica</h2>
+      <p class="modal__lede">Scegli un servizio e incolla il link di una playlist, un album o un brano. Nessuna password: il link resta su questo dispositivo.</p>
+
+      <div class="segmented music-tabs" id="musicTabs" role="group" aria-label="Scegli il servizio">
+        <button type="button" data-source="spotify" aria-pressed="true">Spotify</button>
+        <button type="button" data-source="youtube" aria-pressed="false">YouTube</button>
+      </div>
+
+      <form id="musicForm" novalidate>
+        <label class="field">
+          <span>Link della playlist</span>
+          <input id="musicUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://open.spotify.com/playlist/…" aria-describedby="musicHint">
+        </label>
+        <label class="field">
+          <span>Nome <small>facoltativo</small></span>
+          <input id="musicName" type="text" maxlength="32" autocomplete="off" placeholder="es. Pioggia di domenica">
+        </label>
+        <p class="form-hint" id="musicHint">Incolla il link dalla funzione «Condividi» del servizio.</p>
+        <button class="btn btn--primary btn--full" type="submit" id="musicSubmit">Collega Spotify</button>
+      </form>
+
+      <div class="music-current" id="musicCurrent" hidden>
+        <div class="music-current__head">
+          <span class="source-chip" id="musicCurrentChip"></span>
+          <strong id="musicCurrentName"></strong>
+        </div>
+        <p class="music-current__url" id="musicCurrentUrl"></p>
+        <div class="music-current__actions">
+          <button class="btn btn--soft btn--sm" type="button" id="musicOpen">Apri nel servizio</button>
+          <button class="btn btn--ghost btn--sm" type="button" id="musicPlayHere">Riproduci qui</button>
+          <button class="btn btn--ghost btn--sm" type="button" id="musicUnlink">Scollega</button>
+        </div>
+      </div>
+
+      <div class="music-embed" id="musicEmbed" hidden>
+        <iframe id="musicFrame" title="Player musicale" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+
+      <p class="settings__note">Se il player non parte, il link si apre sempre nel servizio originale. Puoi collegare Spotify e YouTube insieme e scegliere ogni volta quale ascoltare.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="shopModal" hidden>
+    <div class="modal__backdrop" data-close="shop"></div>
+    <div class="modal__card modal__card--shop" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+      <div class="shop__head">
+        <div>
+          <p class="eyebrow">Con gli XP che hai guadagnato</p>
+          <h2 id="shopTitle">Negozio</h2>
+          <p class="shop__lede">Oggetti per il tuo profilo. Gli XP spesi escono dal salvadanaio, ma restano nel punteggio della classifica.</p>
+        </div>
+        <button class="modal__close" type="button" data-close="shop" aria-label="Chiudi il negozio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="shop__balance">
+        <div><span>Disponibili</span><strong id="shopBalance">0 XP</strong></div>
+        <div><span>Totale guadagnato</span><strong id="shopTotal">0 XP</strong></div>
+        <div><span>Collezione</span><strong id="shopOwned">0 / 16</strong></div>
+      </div>
+
+      <div class="segmented shop__filters" id="shopFilters" role="group" aria-label="Filtra gli oggetti">
+        <button type="button" data-filter="all" aria-pressed="true">Tutti</button>
+        <button type="button" data-filter="frame" aria-pressed="false">Cornici</button>
+        <button type="button" data-filter="badge" aria-pressed="false">Titoli</button>
+        <button type="button" data-filter="accent" aria-pressed="false">Colori</button>
+      </div>
+
+      <div class="shop__grid" id="shopGrid"></div>
+
+      <p class="shop__foot" id="shopFoot">Gli oggetti restano tuoi. Puoi cambiarli quando vuoi dal negozio.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="doneModal" hidden>
+    <div class="modal__backdrop" data-close="done"></div>
+    <div class="modal__card modal__card--done" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+      <div class="petals" id="petals" aria-hidden="true"></div>
+      <button class="modal__close" type="button" data-close="done" aria-label="Chiudi">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <p class="eyebrow">Respira. Ce l'hai fatta.</p>
+      <h2 id="doneTitle">Sessione completata</h2>
+      <div class="xp-burst"><span id="doneXp">+313</span><small>XP</small></div>
+      <p class="done-sub" id="doneSub">25 minuti di presenza.</p>
+      <ul class="breakdown" id="doneBreakdown"></ul>
+      <p class="done-foot" id="doneFoot">Il tuo punteggio è in classifica.</p>
+      <div class="done-actions">
+        <button class="btn btn--primary" id="doneBreak" type="button">Prepara una pausa di 5 min</button>
+        <button class="btn btn--soft" id="doneProfile" type="button" hidden>Salva il punteggio in classifica</button>
+        <button class="btn btn--ghost" id="doneClose" type="button">Chiudo qui</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="callModal" hidden>
+    <div class="modal__backdrop" data-close="call"></div>
+    <div class="modal__card modal__card--call" role="dialog" aria-modal="true" aria-labelledby="callTitle">
+      <header class="call-head">
+        <div>
+          <p class="eyebrow">Videochiamata</p>
+          <h2 id="callTitle">Chiama un altro utente</h2>
+          <p class="call-sub" id="callSub">Scrivi il tuo nome, scegli chi chiamare. Chi riceve deve accettare.</p>
+        </div>
+        <button class="modal__close" type="button" data-close="call" aria-label="Chiudi le videochiamate">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      <section class="call-state" id="callSetup">
+        <div class="call-self">
+          <label class="field">
+            <span>Il tuo nome</span>
+            <input id="callSelfName" type="text" maxlength="20" autocomplete="nickname" spellcheck="false" placeholder="Come ti chiami?">
+          </label>
+          <label class="field">
+            <span>Il tuo paese</span>
+            <select id="callSelfCountry" aria-label="Il tuo paese"></select>
+          </label>
+        </div>
+        <p class="call-hint" id="callSelfHint">Il nome che vedrà chi riceve la chiamata.</p>
+
+        <label class="field">
+          <span>Chi vuoi chiamare?</span>
+          <select id="callTarget" aria-label="Scegli chi chiamare"></select>
+        </label>
+
+        <p class="call-error" id="callError" hidden></p>
+        <button class="btn btn--primary btn--full" id="callStart" type="button">Avvia la videochiamata</button>
+        <p class="call-note">La videochiamata si apre in una stanza protetta di Jitsi Meet. Servono microfono e videocamera; il browser chiederà il permesso. Funziona solo con la classifica condivisa attiva e una connessione HTTPS.</p>
+      </section>
+
+      <section class="call-state call-state--waiting" id="callWaiting" hidden>
+        <div class="call-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h3>Sto chiamando <span id="callWaitingName">…</span></h3>
+        <p id="callWaitingHint">In attesa che accetti. La richiesta scade tra pochi secondi.</p>
+        <button class="btn btn--ghost btn--sm" id="callCancel" type="button">Annulla la chiamata</button>
+      </section>
+
+      <section class="call-state call-state--incoming" id="callIncoming" hidden>
+        <div class="call-avatar" id="callIncomingAvatar" aria-hidden="true">M</div>
+        <h3 id="callIncomingName">Qualcuno ti sta chiamando</h3>
+        <p>Accetta per aprire la videochiamata. Se rifiuti, la persona lo saprà.</p>
+        <div class="call-actions">
+          <button class="btn btn--primary" id="callAccept" type="button">Accetta</button>
+          <button class="btn btn--ghost" id="callDecline" type="button">Rifiuta</button>
+        </div>
+      </section>
+
+      <section class="call-state call-state--active" id="callActive" hidden>
+        <div class="call-stage">
+          <iframe id="callFrame" title="Videochiamata Jitsi Meet" allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write" referrerpolicy="no-referrer"></iframe>
+        </div>
+        <div class="call-actions call-actions--active">
+          <span class="call-peer" id="callPeer">In chiamata…</span>
+          <button class="btn btn--danger btn--sm" id="callEnd" type="button">Termina chiamata</button>
+        </div>
+      </section>
+
+      <section class="call-state call-state--ended" id="callEnded" hidden>
+        <p class="eyebrow">Chiamata conclusa</p>
+        <h3 id="callEndedTitle">La chiamata è terminata.</h3>
+        <p id="callEndedText">Quando vuoi, puoi chiamare di nuovo qualcuno.</p>
+        <button class="btn btn--soft" id="callAgain" type="button">Nuova chiamata</button>
+      </section>
+    </div>
+  </div>
+
+  <div class="call-toast" id="callToast" hidden role="alert" aria-live="assertive">
+    <div class="call-toast__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6.4" width="12.4" height="11.2" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15.4 10.4 4.3-2.5a1 1 0 0 1 1.5.9v6.4a1 1 0 0 1-1.5.9l-4.3-2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span class="call-toast__pulse"></span>
+    </div>
+    <div class="call-toast__copy">
+      <strong id="callToastName">Qualcuno ti sta chiamando</strong>
+      <span id="callToastText">Accetta per iniziare la videochiamata.</span>
+    </div>
+    <div class="call-toast__actions">
+      <button class="btn btn--primary btn--sm" id="callToastAccept" type="button">Accetta</button>
+      <button class="btn btn--ghost btn--sm" id="callToastDecline" type="button">Rifiuta</button>
+    </div>
+  </div>
+
+  <div class="modal" id="adminModal" hidden>
+    <div class="modal__backdrop" data-close="admin"></div>
+    <div class="modal__card modal__card--admin" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+
+      <section class="admin-login" id="adminLogin">
+        <button class="modal__close" type="button" data-close="admin" aria-label="Chiudi il pannello admin">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <p class="eyebrow">Area riservata</p>
+        <h2 id="adminTitle">Pannello admin</h2>
+        <p class="modal__lede">Classifica, partecipanti e negozio condivisi. Le credenziali sono quelle impostate sul server, non sono salvate nel sito.</p>
+
+        <p class="admin-offline" id="adminOffline" hidden>Il pannello admin funziona solo con la classifica condivisa attiva (server Python o Netlify). Aprendo <code>index.html</code> da file resta spento.</p>
+
+        <form id="adminLoginForm" novalidate>
+          <label class="field">
+            <span>Nome utente</span>
+            <input id="adminUser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder="admin">
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="adminPassword" type="password" autocomplete="current-password" required placeholder="••••••••">
+          </label>
+          <p class="form-hint admin-error" id="adminLoginError" hidden></p>
+          <button class="btn btn--primary btn--full" type="submit" id="adminLoginSubmit">Entra nel pannello</button>
+        </form>
+
+        <p class="settings__note">La sessione admin resta in questa scheda del browser e si chiude con «Esci». Usa solo una connessione HTTPS.</p>
+      </section>
+
+      <section class="admin-app" id="adminApp" hidden>
+        <header class="admin-head">
+          <div>
+            <p class="eyebrow">Fioritura · gestione condivisa</p>
+            <h2>Pannello admin</h2>
+            <p class="admin-head__sub" id="adminStatus">Carico i dati…</p>
+          </div>
+          <div class="admin-head__actions">
+            <button class="btn btn--ghost btn--sm" id="adminRefresh" type="button">Aggiorna</button>
+            <button class="btn btn--ghost btn--sm" id="adminLogout" type="button">Esci</button>
+            <button class="modal__close" type="button" data-close="admin" aria-label="Chiudi il pannello admin">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <nav class="admin-tabs" id="adminTabs" role="tablist" aria-label="Sezioni del pannello admin">
+          <button type="button" role="tab" data-admin-tab="overview" aria-selected="true">Panoramica</button>
+          <button type="button" role="tab" data-admin-tab="participants" aria-selected="false">Partecipanti</button>
+          <button type="button" role="tab" data-admin-tab="items" aria-selected="false">Oggetti</button>
+          <button type="button" role="tab" data-admin-tab="sessions" aria-selected="false">Sessioni</button>
+        </nav>
+
+        <div class="admin-body">
+          <section class="admin-panel" data-admin-panel="overview">
+            <div class="admin-stats" id="adminStats"></div>
+
+            <div class="admin-grid">
+              <article class="admin-card">
+                <h3>Annuncio in home</h3>
+                <p>Un messaggio breve per tutti i client, sopra il timer.</p>
+                <form id="adminAnnouncementForm">
+                  <label class="field">
+                    <span>Testo dell'annuncio</span>
+                    <textarea id="adminAnnouncementText" rows="3" maxlength="240" placeholder="es. La classifica riparte lunedì. Respira e ricomincia."></textarea>
+                  </label>
+                  <div class="admin-inline">
+                    <button class="btn btn--soft btn--sm" type="submit" id="adminAnnouncementSave">Pubblica</button>
+                    <button class="btn btn--ghost btn--sm" type="button" id="adminAnnouncementClear">Rimuovi</button>
+                  </div>
+                </form>
+              </article>
+
+              <article class="admin-card admin-card--danger">
+                <h3>Classifica e negozio</h3>
+                <p>Azzera la classifica condivisa prima di far entrare i clienti veri.</p>
+                <label class="admin-check">
+                  <input type="checkbox" id="adminResetShop">
+                  <span>Svuota anche gli inventari del negozio</span>
+                </label>
+                <label class="admin-check">
+                  <input type="checkbox" id="adminResetCatalog">
+                  <span>Ripristina anche prezzi e disponibilità del catalogo</span>
+                </label>
+                <div class="admin-inline">
+                  <button class="btn btn--danger btn--sm" type="button" id="adminResetLeaderboard">Azzera classifica</button>
+                  <button class="btn btn--ghost btn--sm" type="button" id="adminResetShopOnly">Svuota solo inventari</button>
+                  <button class="btn btn--ghost btn--sm" type="button" id="adminExport">Esporta stato</button>
+                </div>
+                <p class="admin-hint">L'azzeramento elimina sessioni e rettifiche XP. L'annuncio resta.</p>
+              </article>
+
+              <article class="admin-card admin-card--wide">
+                <h3>Ultime rettifiche XP</h3>
+                <p>Ogni modifica manuale resta tracciata. Puoi annullare una rettifica con «Annulla».</p>
+                <ul class="admin-log" id="adminAdjustments"></ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="admin-panel" data-admin-panel="participants" hidden>
+            <div class="admin-toolbar">
+              <label class="admin-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <input id="adminSearch" type="search" placeholder="Cerca un partecipante…" autocomplete="off" aria-label="Cerca un partecipante">
+              </label>
+              <span class="admin-toolbar__count" id="adminParticipantCount"></span>
+            </div>
+            <div class="admin-list" id="adminParticipants"></div>
+          </section>
+
+          <section class="admin-panel" data-admin-panel="items" hidden>
+            <p class="admin-hint">Qui cambi prezzi e disponibilità per tutti. Un oggetto disattivato resta nell'inventario di chi lo possiede, ma non si può più comprare.</p>
+            <div class="admin-items" id="adminItems"></div>
+          </section>
+
+          <section class="admin-panel" data-admin-panel="sessions" hidden>
+            <p class="admin-hint" id="adminSessionsHint">Le ultime 200 sessioni condivise. Puoi eliminarle una per una.</p>
+            <div class="admin-sessions" id="adminSessions"></div>
+          </section>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="assets/js/countries.js"></script>
+  <script src="assets/js/audio.js"></script>
+  <script src="assets/js/leaderboard.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
